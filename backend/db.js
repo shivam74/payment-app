@@ -15,14 +15,22 @@ const userSchema = new mongoose.userSchema({
     firstName : {
         type : String,
         required : true,
-        unique : true,
         trim : true,
-        lowercase : true,
-        minLength : 4,
+        minLength : 3,
         maxLength : 30
     },
-    lastName : String ,
-    password : String
+    lastName : {
+        type : String,
+        required : true,
+        trim : true,
+        minLength : 3,
+        maxLength : 30
+    },
+    password : {
+        type : String,
+        required : true,
+        minLength : 6
+    }
 })
 
 const User = mongoose.model ('User',userSchema);
