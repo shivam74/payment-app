@@ -6,13 +6,11 @@ const jwt = require("jsonwebtoken");
 const JWT_SECRET = require("../config")
 
 const signupSchema = zod.object({
-    userName : zod.string.email(),
-    password : zod.string,
-    firstName : zod.string,
-    lastName : zod.string
+    userName : zod.string().email(),
+    password : zod.string(),
+    firstName : zod.string(),
+    lastName : zod.string()
 })
-
-
 
 router.post("/signup", async (req,res)=>{
     const body = req.body;
@@ -38,6 +36,79 @@ router.post("/signup", async (req,res)=>{
         message : "User created successfully",
         token : token
     })
+})
+
+const signinSchema = zod.object({
+    userName : zod.string(),
+    password : zod.string()
+})
+
+router.post("/signin",async (req,res)=>{
+    const {success} = signinSchema.safeParse(req.body);
+    if(!success){
+        res.status(411).json({
+             message: "Email already taken / Incorrect inputs"
+        })
+        return;
+    }
+    const user = User.findOne({
+        username : req.body.username,
+        password : req.body.password
+    });
+
+    if(!user){
+        res.status(411).json({
+            message: "Error while logging in"
+        })
+        return;
+    }
+    const token = jwt.sign({userId : user._id},JWT_SECRET);
+    res.json({
+        token : token
+    });
+    
+})
+
+const updateSchema = zod.object({
+    password : zod.string().optional(),
+    firstName : zod.string().optional(),
+    lastName : zod.string().optional()
+})
+
+router.put("/",async (req,res)=>{
+    const {success} = updateSchema.safeParse(req.body);
+    if(!success){
+        return res.status(411).json({
+            message :  "Error while updating information"
+        })
+    }
+    await User.updateOne({
+        _id : req.userId
+    },req.body);
+
+    res.json({
+        message: "Updated successfully"
+    })
+})
+
+router.get("/bulk",async (req,res)=>{
+    const filter = req.query.filter || "";
+    const users = await User.find({
+        $or : [
+            { firstName : { $regex : filter}},
+            { lastName : {$regex : filter}}
+        ]
+    })
+
+    res.json({
+        user : users.map((user)=>({
+            username: user.username,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            _id: user._id
+        }))
+    })
+    
 })
 
 
