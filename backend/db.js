@@ -30,7 +30,7 @@ const userSchema = new mongoose.userSchema({
         type : String,
         required : true,
         minLength : 6
-    }
+    }   
 })
 
 const User = mongoose.model ('User',userSchema);
