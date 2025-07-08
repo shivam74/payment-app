@@ -12,7 +12,7 @@ const signupSchema = zod.object({
     lastName : zod.string
 })
 
-const signinSchema
+
 
 router.post("/signup", async (req,res)=>{
     const body = req.body;
@@ -22,11 +22,11 @@ router.post("/signup", async (req,res)=>{
             message : "Email already taken/incorrect inputs"
         })
     }
-    const user = User.findOne({
+    const existingUser = User.findOne({
         userName : body.userName
     })
-    if(user._id){
-        return res.json({
+    if(existingUser._id){
+        return res.json({ 
             message : "Email already taken/incorrect inputs"
         })
     }
