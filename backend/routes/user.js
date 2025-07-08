@@ -12,7 +12,7 @@ const signupSchema = zod.object({
     lastName : zod.string
 })
 
-
+const signinSchema
 
 router.post("/signup", async (req,res)=>{
     const body = req.body;
