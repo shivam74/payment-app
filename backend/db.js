@@ -4,7 +4,7 @@ require("dotenv").config()
 const mongo_uri = process.env.MONGO_URI;
 mongoose.connect(mongo_uri);
 
-const userSchema = new mongoose.userSchema({
+const userSchema = new mongoose.Schema({
     userName: {
         type : String,
         required : true,
@@ -35,7 +35,7 @@ const userSchema = new mongoose.userSchema({
     }   
 })
 
-const accountSchema =new mongoose.accountSchema({
+const accountSchema =new mongoose.Schema({
     userId : {
         type : mongoose.Schema.Types.ObjectId,
         ref : 'User',

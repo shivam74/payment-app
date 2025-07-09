@@ -15,18 +15,19 @@ const signupSchema = zod.object({
 
 router.post("/signup", async (req,res)=>{
     const body = req.body;
-    const success = signupSchema.safeParse(req.body);
+    const {success} = signupSchema.safeParse(req.body);
     if(!success){
-        return res.json({
-            message : "Email already taken/incorrect inputs"
+        console.log("test");
+        return res.status(411).json({
+            message : "incorrect inputs"
         })
     }
-    const existingUser = User.findOne({
+    const existingUser =await User.findOne({
         userName : body.userName
     })
-    if(existingUser._id){
+    if(existingUser){
         return res.json({ 
-            message : "Email already taken/incorrect inputs"
+            message : "Email already taken"
         })
     }
     const dbUser = await User.create(body);
@@ -60,14 +61,14 @@ router.post("/signin",async (req,res)=>{
         })
         return;
     }
-    const user = User.findOne({
-        username : req.body.username,
+    const user =await User.findOne({
+        userName : req.body.userName,
         password : req.body.password
     });
 
     if(!user){
         res.status(411).json({
-            message: "Error while logging in"
+            message: "wrong username/password"
         })
         return;
     }
@@ -104,14 +105,14 @@ router.get("/bulk",async (req,res)=>{
     const filter = req.query.filter || "";
     const users = await User.find({
         $or : [
-            { firstName : { $regex : filter}},
-            { lastName : {$regex : filter}}
+            { firstName : { $regex : filter, $options: "i"}},
+            { lastName : {$regex : filter,$options: "i"}}
         ]
     })
 
     res.json({
         user : users.map((user)=>({
-            username: user.username,
+            userName: user.userName,
             firstName: user.firstName,
             lastName: user.lastName,
             _id: user._id
